@@ -13,18 +13,18 @@
     (destructuring-bind (email . password) (tumblr-auth-info)
       (let* ((title (read-string "Post title: "))
              (data (replace-regexp-in-string 
-                    "\\(<pre\\|</pre>\\)" ""
+                    "\\(<pre>\\|</pre>\\)" ""
                     (buffer-substring (point-min) (point-max))))
              (url-request-method "POST")
              (url-request-extra-headers '(("Content-Type" . "application/xml")))
-             (url-request-data (concat
-                                "email=" (url-hexify-string email)
-                                "&password=" (url-hexify-string password)
-                                "&title=" (url-hexify-string title)
-                                "&format=" "html"
-                                "&private=" "0"
-                                "&content=" (url-hexify-string data))))
-        (url-retrieve-synchronously "http://www.tumblr.com/api/write")))))
+             (url-request-data (gist-make-query-string
+                                '(("email" . email)
+                                ("password" . password)
+                                ("title" . title)
+                                ("format" . "html")
+                                ("private" . "0")
+                                ("body" . data)))))
+        (kill-buffer (url-retrieve-synchronously "http://www.tumblr.com/api/write"))))))
 
 (defun tumblr-auth-info ()
   "Returns the user's tumblr authorization information."
