@@ -26,6 +26,10 @@
 
 ;;; Commentary:
 
+;; Requires gist.el and tumblr.el, available at:
+;; http://github.com/defunkt/gist.el
+;; http://www.emacswiki.org/emacs/Tumblr#toc7
+
 ;;; Code:
 
 (require 'gist)
@@ -52,19 +56,19 @@
                              "\\(<pre>\\|</pre>\\)" ""
                              content))
              (title (read-string "Post title: "))
-             (tags (read-string "Post tags: "))
-             (prepend (read-string "Post body: ")))
-        (tumblr-gist-send-post title tags (concat prepend "<br/><br/>" fixed-content))))))
+             (tags (read-string "Post tags: ")))
+        (tumblr-gist-send-post title tags fixed-content)))))
 
 (defun tumblr-gist-send-post (title tags body)
   "Slightly more detailed variant on the 'tumblr send-post function"
-  (http-post-simple tumblr-post-url `(('email . ,tumblr-email)
-                                      ('password . ,tumblr-password)
-                                      ('type . ,tumblr-default-type)
-                                      ('title . ,title)
-                                      ('tags . ,tags)
-                                      ('slug . ,title)
-                                      ('private . "1"))
+  (http-post-simple tumblr-post-url (list (cons 'email tumblr-email)
+                                          (cons 'password tumblr-password)
+                                          (cons 'type tumblr-default-type)
+                                          (cons 'title title)
+                                          (cons 'tags tags)
+                                          (cons 'slug title)
+                                          (cons 'private "0")
+                                          (cons 'body body))
                     'utf-8))
 
 (provide 'tumblr-gist)
